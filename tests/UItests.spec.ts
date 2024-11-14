@@ -33,3 +33,23 @@ test('add new owner', async ({page}) => {
     await expect(page.getByRole('table')).toContainText('test subject');
 
 });
+
+test('edit owner', async ({page}) => {
+    await page.goto("localhost:8080/");
+    await page.getByText('owners').click();
+    await page.getByText('search').click();
+
+    await page.getByTestId('lastName').fill("subject");
+    await page.getByText("Find Owner").click();
+
+    await page.getByText("test subject").click();
+    await page.getByText("Edit Owner").click();
+
+    await page.getByTestId('firstName').fill("why");
+    await page.getByTestId('lastName').fill("do");
+    await page.getByTestId('address').fill("you");
+    await page.getByTestId('city').fill("edit");
+    await page.getByTestId('telephone').fill("987654321");
+    await page.getByText("Update Owner").click();
+
+})
