@@ -65,7 +65,7 @@ test('edit owner', async ({page}) => {
     await page.getByTestId('lastName').fill(lastNameEdited);
     await page.getByTestId('address').fill(addressEdited);
     await page.getByTestId('city').fill(cityEdited);
-    await page.getByTestId('telephone').fill(telephone);
+    await page.getByTestId('telephone').fill(telephoneEdited);
     await page.getByText("Update Owner").click();
 
     await page.getByText('back').click();
