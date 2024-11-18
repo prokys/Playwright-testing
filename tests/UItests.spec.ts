@@ -1,4 +1,5 @@
 import {test, expect} from "@playwright/test";
+import MainPage from "./pages/mainPage";
 
 const url = "localhost:8080/";
 const firstName = "test";
@@ -24,8 +25,9 @@ test('check if page loads', async ({page}) => {
 
 test('search for owner', async ({page}) => {
 
-    await page.getByText('owners').click();
-    await page.getByText('search').click();
+    const mainPage = new MainPage(page);
+
+    mainPage.gotoUsersSearchPage();
 
     await page.getByTestId('lastName').fill("Davis");
     await page.getByText("Find Owner").click();
@@ -36,8 +38,9 @@ test('search for owner', async ({page}) => {
 
 test('add new owner', async ({page}) => {
 
-    await page.getByText('owners').click();
-    await page.getByText('add new').first().click();
+    const mainPage = new MainPage(page);
+
+    mainPage.gotoUsersAddNewPage();
 
     await page.getByTestId('firstName').fill(firstName);
     await page.getByTestId('lastName').fill(lastName);
@@ -52,8 +55,9 @@ test('add new owner', async ({page}) => {
 
 test('edit owner', async ({page}) => {
 
-    await page.getByText('owners').click();
-    await page.getByText('search').click();
+    const mainPage = new MainPage(page);
+
+    mainPage.gotoUsersSearchPage();
 
     await page.getByTestId('lastName').fill(lastName);
     await page.getByText("Find Owner").click();
