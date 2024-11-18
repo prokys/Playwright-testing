@@ -36,7 +36,7 @@ test('search for owner', async ({page}) => {
     await ownersSearchPage.fillLastName('Davis');
     await ownersSearchPage.clickFindOwnerButton();
 
-    await expect(await page.getByRole('table')).toContainText('Betty Davis');
+    await ownersSearchPage.checkIfOwnerIsInTable('Betty Davis');
 
 });
 
@@ -49,7 +49,8 @@ test('add new owner', async ({page}) => {
     await ownersAddNewPage.fillOwnerInfo(firstName, lastName, address, city, telephone);
     await ownersAddNewPage.clickAddOwnerButton();
 
-    await expect(await page.getByRole('table')).toContainText(firstName+' '+lastName);
+    const ownersSearchPage = new OwnersSearchPage(page);
+    await ownersSearchPage.checkIfOwnerIsInTable(firstName+' '+lastName)
 
 });
 
@@ -72,6 +73,6 @@ test('edit owner', async ({page}) => {
 
     await ownersInformationPage.clickBackButton();
 
-    await expect(await page.getByRole('table')).toContainText(firstNameEdited+' '+lastNameEdited);
+    await ownersSearchPage.checkIfOwnerIsInTable(firstNameEdited+' '+lastNameEdited)
 
 })
