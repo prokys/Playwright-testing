@@ -1,6 +1,7 @@
 import {test, expect} from "@playwright/test";
 import MainPage from "./pages/mainPage";
 import OwnersSearchPage from "./pages/ownersSearchPage";
+import OwnersAddNewPage from "./pages/ownersAddNewPage";
 
 const url = "localhost:8080/";
 const firstName = "test";
@@ -40,15 +41,11 @@ test('search for owner', async ({page}) => {
 test('add new owner', async ({page}) => {
 
     const mainPage = new MainPage(page);
-
     mainPage.gotoUsersAddNewPage();
 
-    await page.getByTestId('firstName').fill(firstName);
-    await page.getByTestId('lastName').fill(lastName);
-    await page.getByTestId('address').fill(address);
-    await page.getByTestId('city').fill(city);
-    await page.getByTestId('telephone').fill(telephone);
-    await page.getByText("Add Owner").click();
+    const ownersAddNewPage = new OwnersAddNewPage(page);
+    ownersAddNewPage.fillOwnerInfo(firstName, lastName, address, city, telephone);
+    ownersAddNewPage.clickAddOwnerButton();
 
     await expect(page.getByRole('table')).toContainText(firstName+' '+lastName);
 
