@@ -1,5 +1,6 @@
 import {test, expect} from "@playwright/test";
 import MainPage from "./pages/mainPage";
+import OwnersSearchPage from "./pages/ownersSearchPage";
 
 const url = "localhost:8080/";
 const firstName = "test";
@@ -26,11 +27,11 @@ test('check if page loads', async ({page}) => {
 test('search for owner', async ({page}) => {
 
     const mainPage = new MainPage(page);
-
     mainPage.gotoUsersSearchPage();
 
-    await page.getByTestId('lastName').fill("Davis");
-    await page.getByText("Find Owner").click();
+    const ownersSearchPage = new OwnersSearchPage(page);
+    ownersSearchPage.fillLastName(lastName);
+    ownersSearchPage.clickFindOwnerButton();
 
     await expect(page.getByRole('table')).toContainText('Betty Davis');
 
@@ -59,8 +60,9 @@ test('edit owner', async ({page}) => {
 
     mainPage.gotoUsersSearchPage();
 
-    await page.getByTestId('lastName').fill(lastName);
-    await page.getByText("Find Owner").click();
+    const ownersSearchPage = new OwnersSearchPage(page);
+    ownersSearchPage.fillLastName(lastName);
+    ownersSearchPage.clickFindOwnerButton();
 
     await page.getByText("test subject").click();
     await page.getByText("Edit Owner").click();
