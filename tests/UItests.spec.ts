@@ -1,5 +1,5 @@
 import { test } from "./fixtures/basePage";
-import { expect } from "@playwright/test";
+import { expect, APIRequestContext, Response } from "@playwright/test";
 import MainPage from "./pages/mainPage";
 import OwnersSearchPage from "./pages/ownersSearchPage";
 import OwnersAddNewPage from "./pages/ownersAddNewPage";
@@ -19,6 +19,8 @@ const addressEdited = "you";
 const cityEdited = "edit";
 const telephoneEdited = "987654321";
 
+let ownerID: number;
+
 test.beforeEach('load base url page', async ({page}) =>{
     await page.goto(url);
 })
@@ -28,43 +30,84 @@ test('check if page loads', async ({page}) => {
     await expect(page).toHaveTitle(/Petclinic/);
 });
 
-test('search for owner', async ({mainPage, ownersSearchPage}) => {
 
-    await mainPage.gotoOwnersSearchPage();
+test.describe('create user before, delete after', () =>{
 
-    await ownersSearchPage.fillLastName('Davis');
-    await ownersSearchPage.clickFindOwnerButton();
+    test.beforeEach('load base url page', async ({request}) =>{
+        const response = await request.post('http://localhost:9966/petclinic/api/owners', {
+            data: {
+                firstName: firstName,
+                lastName: lastName,
+                address: address,
+                city: city,
+                telephone: telephone
+            }
+        });
+        const body = await response.json();
+        ownerID = body.id;
+    })
 
-    await ownersSearchPage.checkIfOwnerIsInTable('Betty Davis');
+    test('search for owner', async ({mainPage, ownersSearchPage}) => {
 
-});
+        await mainPage.gotoOwnersSearchPage();
+    
+        await ownersSearchPage.fillLastName(lastName);
+        await ownersSearchPage.clickFindOwnerButton();
+    
+        await ownersSearchPage.checkIfOwnerIsInTable(firstName+' '+lastName);
+    
+    });
 
-test('add new owner', async ({mainPage, ownersAddNewPage, ownersSearchPage}) => {
+    test('edit owner', async ({mainPage, ownersSearchPage, ownersInformationPage, ownersEditPage}) => {
 
-    await mainPage.gotoOwnersAddNewPage();
+        await mainPage.gotoOwnersSearchPage();
+    
+        await ownersSearchPage.fillLastName(lastName);
+        await ownersSearchPage.clickFindOwnerButton();
+        await ownersSearchPage.gotoOwnersInformationPage(firstName+ ' '+lastName);
+    
+        await ownersInformationPage.clickEditOwnerButton();
+    
+        await ownersEditPage.fillOwnerInfo(firstNameEdited, lastNameEdited, addressEdited, cityEdited, telephoneEdited)
+        await ownersEditPage.clickUpdateOwnerButton();
+    
+        await ownersInformationPage.clickBackButton();
+    
+        await ownersSearchPage.checkIfOwnerIsInTable(firstNameEdited+' '+lastNameEdited)
+    
+    })
 
-    await ownersAddNewPage.fillOwnerInfo(firstName, lastName, address, city, telephone);
-    await ownersAddNewPage.clickAddOwnerButton();
+    test.afterEach('Delte created owner', async ({ request }) => {
+        const response = await request.delete('http://localhost:9966/petclinic/api/owners/'+ownerID);
+        console.log('Owner with ID: '+ownerID+' deleted');
+    })
+})
 
-    await ownersSearchPage.checkIfOwnerIsInTable(firstName+' '+lastName)
+test.describe('Delete after', () => {
+    
+    test('add new owner', async ({page, mainPage, ownersAddNewPage, ownersSearchPage}) => {
 
-});
+        page.on('response', async (response) => {
+            if (response.request().method() === 'POST'){
+                const body = await response.json();
+                ownerID = body.id;
+            }
+        })
 
-test('edit owner', async ({mainPage, ownersSearchPage, ownersInformationPage, ownersEditPage}) => {
+        await mainPage.gotoOwnersAddNewPage();
+    
+        await ownersAddNewPage.fillOwnerInfo(firstName, lastName, address, city, telephone);
+        await ownersAddNewPage.clickAddOwnerButton();
+    
+        await ownersSearchPage.checkIfOwnerIsInTable(firstName+' '+lastName)
+    
+    });
 
-    await mainPage.gotoOwnersSearchPage();
-
-    await ownersSearchPage.fillLastName(lastName);
-    await ownersSearchPage.clickFindOwnerButton();
-    await ownersSearchPage.gotoOwnersInformationPage(firstName+ ' '+lastName);
-
-    await ownersInformationPage.clickEditOwnerButton();
-
-    await ownersEditPage.fillOwnerInfo(firstNameEdited, lastNameEdited, addressEdited, cityEdited, telephoneEdited)
-    await ownersEditPage.clickUpdateOwnerButton();
-
-    await ownersInformationPage.clickBackButton();
-
-    await ownersSearchPage.checkIfOwnerIsInTable(firstNameEdited+' '+lastNameEdited)
+    test.afterEach('Delete created owner', async ({request}) => {
+        const response = await request.delete('http://localhost:9966/petclinic/api/owners/'+ownerID);
+        console.log('Owner with ID: '+ownerID+' deleted');
+    });
 
 })
+
+
