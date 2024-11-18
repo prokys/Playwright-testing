@@ -12,6 +12,7 @@ export default class OwnersSearchPage extends MainPage {
     lastNameInput = () => this.page.getByTestId('lastName');
     findOwnerButton = () => this.page.getByText('Find Owner');
     resultsTable = () => this.page.getByRole('table');
+    ownerByText = (owner: string) => this.page.getByText(owner);
 
 
     public async fillLastName(lastName: string){
@@ -20,5 +21,9 @@ export default class OwnersSearchPage extends MainPage {
 
     public async clickFindOwnerButton(){
         await this.findOwnerButton().click();
+    }
+
+    public async gotoOwnersInformationPage(owner: string){
+        await this.ownerByText(owner).click();
     }
 }

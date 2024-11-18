@@ -2,6 +2,8 @@ import {test, expect} from "@playwright/test";
 import MainPage from "./pages/mainPage";
 import OwnersSearchPage from "./pages/ownersSearchPage";
 import OwnersAddNewPage from "./pages/ownersAddNewPage";
+import OwnersEditPage from "./pages/ownersEditPage";
+import OwnersInformationPage from "./pages/ownersInformationPage";
 
 const url = "localhost:8080/";
 const firstName = "test";
@@ -28,51 +30,48 @@ test('check if page loads', async ({page}) => {
 test('search for owner', async ({page}) => {
 
     const mainPage = new MainPage(page);
-    mainPage.gotoUsersSearchPage();
+    await mainPage.gotoOwnersSearchPage();
 
     const ownersSearchPage = new OwnersSearchPage(page);
-    ownersSearchPage.fillLastName(lastName);
-    ownersSearchPage.clickFindOwnerButton();
+    await ownersSearchPage.fillLastName('Davis');
+    await ownersSearchPage.clickFindOwnerButton();
 
-    await expect(page.getByRole('table')).toContainText('Betty Davis');
+    await expect(await page.getByRole('table')).toContainText('Betty Davis');
 
 });
 
 test('add new owner', async ({page}) => {
 
     const mainPage = new MainPage(page);
-    mainPage.gotoUsersAddNewPage();
+    await mainPage.gotoOwnersAddNewPage();
 
     const ownersAddNewPage = new OwnersAddNewPage(page);
-    ownersAddNewPage.fillOwnerInfo(firstName, lastName, address, city, telephone);
-    ownersAddNewPage.clickAddOwnerButton();
+    await ownersAddNewPage.fillOwnerInfo(firstName, lastName, address, city, telephone);
+    await ownersAddNewPage.clickAddOwnerButton();
 
-    await expect(page.getByRole('table')).toContainText(firstName+' '+lastName);
+    await expect(await page.getByRole('table')).toContainText(firstName+' '+lastName);
 
 });
 
 test('edit owner', async ({page}) => {
 
     const mainPage = new MainPage(page);
-
-    mainPage.gotoUsersSearchPage();
+    await mainPage.gotoOwnersSearchPage();
 
     const ownersSearchPage = new OwnersSearchPage(page);
-    ownersSearchPage.fillLastName(lastName);
-    ownersSearchPage.clickFindOwnerButton();
+    await ownersSearchPage.fillLastName(lastName);
+    await ownersSearchPage.clickFindOwnerButton();
+    await ownersSearchPage.gotoOwnersInformationPage(firstName+ ' '+lastName);
 
-    await page.getByText("test subject").click();
-    await page.getByText("Edit Owner").click();
+    const ownersInformationPage = new OwnersInformationPage(page);
+    await ownersInformationPage.clickEditOwnerButton();
 
-    await page.getByTestId('firstName').fill(firstNameEdited);
-    await page.getByTestId('lastName').fill(lastNameEdited);
-    await page.getByTestId('address').fill(addressEdited);
-    await page.getByTestId('city').fill(cityEdited);
-    await page.getByTestId('telephone').fill(telephoneEdited);
-    await page.getByText("Update Owner").click();
+    const ownersEditPage = new OwnersEditPage(page);
+    await ownersEditPage.fillOwnerInfo(firstNameEdited, lastNameEdited, addressEdited, cityEdited, telephoneEdited)
+    await ownersEditPage.clickUpdateOwnerButton();
 
-    await page.getByText('back').click();
+    await ownersInformationPage.clickBackButton();
 
-    await expect(page.getByRole('table')).toContainText(firstNameEdited+' '+lastNameEdited);
+    await expect(await page.getByRole('table')).toContainText(firstNameEdited+' '+lastNameEdited);
 
 })

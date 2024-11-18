@@ -7,18 +7,18 @@ export default class MainPage {
         this.page = page;
     }
 
-    usersDropdown = () => this.page.getByText('Owners');
-    usersSearchButton = () => this.page.getByText('Search');
-    usersAddNewButton = () => this.page.getByText('Add new').first();
+    ownersDropdown = () => this.page.getByText('Owners');
+    ownersSearchButton = () => this.page.getByText('Search');
+    ownersAddNewButton = () => this.page.getByText('Add new').first();
 
-    public async gotoUsersSearchPage(){
-        await this.usersDropdown().click();
-        await this.usersSearchButton().click();
+    public async gotoOwnersSearchPage(){
+        await this.ownersDropdown().click();
+        await this.ownersSearchButton().click();
     }
 
-    public async gotoUsersAddNewPage(){
-        await this.usersDropdown().click();
-        await this.usersAddNewButton().click();
+    public async gotoOwnersAddNewPage(){
+        await this.ownersDropdown().click();
+        await this.ownersAddNewButton().click();
     }
 
 }
