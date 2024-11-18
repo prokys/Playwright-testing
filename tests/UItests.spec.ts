@@ -1,4 +1,5 @@
-import {test, expect} from "@playwright/test";
+import { test } from "./fixtures/basePage";
+import { expect } from "@playwright/test";
 import MainPage from "./pages/mainPage";
 import OwnersSearchPage from "./pages/ownersSearchPage";
 import OwnersAddNewPage from "./pages/ownersAddNewPage";
@@ -27,12 +28,10 @@ test('check if page loads', async ({page}) => {
     await expect(page).toHaveTitle(/Petclinic/);
 });
 
-test('search for owner', async ({page}) => {
+test('search for owner', async ({mainPage, ownersSearchPage}) => {
 
-    const mainPage = new MainPage(page);
     await mainPage.gotoOwnersSearchPage();
 
-    const ownersSearchPage = new OwnersSearchPage(page);
     await ownersSearchPage.fillLastName('Davis');
     await ownersSearchPage.clickFindOwnerButton();
 
@@ -40,34 +39,27 @@ test('search for owner', async ({page}) => {
 
 });
 
-test('add new owner', async ({page}) => {
+test('add new owner', async ({mainPage, ownersAddNewPage, ownersSearchPage}) => {
 
-    const mainPage = new MainPage(page);
     await mainPage.gotoOwnersAddNewPage();
 
-    const ownersAddNewPage = new OwnersAddNewPage(page);
     await ownersAddNewPage.fillOwnerInfo(firstName, lastName, address, city, telephone);
     await ownersAddNewPage.clickAddOwnerButton();
 
-    const ownersSearchPage = new OwnersSearchPage(page);
     await ownersSearchPage.checkIfOwnerIsInTable(firstName+' '+lastName)
 
 });
 
-test('edit owner', async ({page}) => {
+test('edit owner', async ({mainPage, ownersSearchPage, ownersInformationPage, ownersEditPage}) => {
 
-    const mainPage = new MainPage(page);
     await mainPage.gotoOwnersSearchPage();
 
-    const ownersSearchPage = new OwnersSearchPage(page);
     await ownersSearchPage.fillLastName(lastName);
     await ownersSearchPage.clickFindOwnerButton();
     await ownersSearchPage.gotoOwnersInformationPage(firstName+ ' '+lastName);
 
-    const ownersInformationPage = new OwnersInformationPage(page);
     await ownersInformationPage.clickEditOwnerButton();
 
-    const ownersEditPage = new OwnersEditPage(page);
     await ownersEditPage.fillOwnerInfo(firstNameEdited, lastNameEdited, addressEdited, cityEdited, telephoneEdited)
     await ownersEditPage.clickUpdateOwnerButton();
 
